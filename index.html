@@ -5,52 +5,85 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>מפת האושר של שחר</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
-      direction: rtl;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f8;
+      color: #333;
       padding: 20px;
     }
+
     h1 {
       text-align: center;
-      color: #336699;
+      color: #2c3e50;
     }
-    .section {
-      background-color: white;
+
+    .card {
+      background: white;
       border-radius: 8px;
-      padding: 15px;
-      margin-bottom: 15px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 700px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
+
     label {
       font-weight: bold;
-      display: block;
       margin-bottom: 5px;
+      display: block;
     }
+
     textarea {
       width: 100%;
-      height: 80px;
       padding: 10px;
-      margin-bottom: 10px;
       border: 1px solid #ccc;
-      border-radius: 5px;
+      border-radius: 6px;
       resize: vertical;
+      min-height: 70px;
+      margin-bottom: 10px;
     }
+
     button {
-      background-color: #336699;
+      background-color: #2980b9;
       color: white;
-      padding: 8px 16px;
       border: none;
-      border-radius: 5px;
+      padding: 10px 18px;
+      border-radius: 6px;
       cursor: pointer;
+      transition: 0.3s;
     }
+
     button:hover {
-      background-color: #2a507d;
+      background-color: #1c5f8b;
     }
-    .saved {
+
+    .saved-msg {
       color: green;
       font-size: 0.9em;
       margin-top: 5px;
+    }
+
+    .view-entries {
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    .entry {
+      background: #fff;
+      border-radius: 6px;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-right: 5px solid #3498db;
+    }
+
+    @media (max-width: 600px) {
+      .card {
+        margin: 10px;
+      }
     }
   </style>
 </head>
@@ -58,7 +91,12 @@
 
   <h1>מפת האושר של שחר</h1>
 
-  <div id="questions-container"></div>
+  <div class="card" id="questions-container"></div>
+
+  <div class="view-entries">
+    <button onclick="showEntries()">הצג רשומות קודמות</button>
+    <div id="entries-container"></div>
+  </div>
 
   <script>
     const questions = [
@@ -77,28 +115,30 @@
     ];
 
     const container = document.getElementById('questions-container');
+    const dateKey = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 
     questions.forEach((question, index) => {
       const section = document.createElement('div');
-      section.className = 'section';
 
       const label = document.createElement('label');
       label.innerText = question;
 
       const textarea = document.createElement('textarea');
       textarea.id = `answer-${index}`;
-      textarea.value = localStorage.getItem(`answer-${index}`) || '';
+      textarea.value = JSON.parse(localStorage.getItem(dateKey) || '{}')[`q${index}`] || '';
 
       const saveBtn = document.createElement('button');
       saveBtn.innerText = 'שמור';
+      const savedMsg = document.createElement('div');
+      savedMsg.className = 'saved-msg';
+
       saveBtn.onclick = () => {
-        localStorage.setItem(`answer-${index}`, textarea.value);
+        let entry = JSON.parse(localStorage.getItem(dateKey) || '{}');
+        entry[`q${index}`] = textarea.value;
+        localStorage.setItem(dateKey, JSON.stringify(entry));
         savedMsg.innerText = 'נשמר בהצלחה!';
         setTimeout(() => savedMsg.innerText = '', 2000);
       };
-
-      const savedMsg = document.createElement('div');
-      savedMsg.className = 'saved';
 
       section.appendChild(label);
       section.appendChild(textarea);
@@ -106,6 +146,22 @@
       section.appendChild(savedMsg);
       container.appendChild(section);
     });
+
+    function showEntries() {
+      const entriesContainer = document.getElementById('entries-container');
+      entriesContainer.innerHTML = '';
+      Object.keys(localStorage).sort().reverse().forEach(key => {
+        if (!key.match(/^\d{4}-\d{2}-\d{2}$/)) return;
+        const data = JSON.parse(localStorage.getItem(key));
+        const div = document.createElement('div');
+        div.className = 'entry';
+        div.innerHTML = `<strong>${key}</strong><br>` +
+          questions.map((q, i) =>
+            data[`q${i}`] ? `<b>${q}</b><br>${data[`q${i}`]}<br><br>` : ''
+          ).join('');
+        entriesContainer.appendChild(div);
+      });
+    }
   </script>
 
 </body>

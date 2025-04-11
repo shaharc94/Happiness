@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>מפת האושר של שחר</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      direction: rtl;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #336699;
+    }
+    .section {
+      background-color: white;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+    textarea {
+      width: 100%;
+      height: 80px;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      resize: vertical;
+    }
+    button {
+      background-color: #336699;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #2a507d;
+    }
+    .saved {
+      color: green;
+      font-size: 0.9em;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>מפת האושר של שחר</h1>
+
+  <div id="questions-container"></div>
+
+  <script>
+    const questions = [
+      "מה חשוב לי לזכור היום?",
+      "מה היה טוב היום?",
+      "עם מי התחברתי השבוע?",
+      "מה יצרתי השבוע?",
+      "האם יצאתי לטיול בטבע?",
+      "מה שיתפתי מהלב השבוע?",
+      "איזו מטרה קטנה השגתי החודש?",
+      "האם יזמתי משהו חברתי עם ערך?",
+      "מה החזרתי לחיים שלי מהעבר?",
+      "מה נהניתי השבוע?",
+      "מה הלחיץ אותי השבוע?",
+      "מה הייתי רוצה לשנות בשבוע הבא?"
+    ];
+
+    const container = document.getElementById('questions-container');
+
+    questions.forEach((question, index) => {
+      const section = document.createElement('div');
+      section.className = 'section';
+
+      const label = document.createElement('label');
+      label.innerText = question;
+
+      const textarea = document.createElement('textarea');
+      textarea.id = `answer-${index}`;
+      textarea.value = localStorage.getItem(`answer-${index}`) || '';
+
+      const saveBtn = document.createElement('button');
+      saveBtn.innerText = 'שמור';
+      saveBtn.onclick = () => {
+        localStorage.setItem(`answer-${index}`, textarea.value);
+        savedMsg.innerText = 'נשמר בהצלחה!';
+        setTimeout(() => savedMsg.innerText = '', 2000);
+      };
+
+      const savedMsg = document.createElement('div');
+      savedMsg.className = 'saved';
+
+      section.appendChild(label);
+      section.appendChild(textarea);
+      section.appendChild(saveBtn);
+      section.appendChild(savedMsg);
+      container.appendChild(section);
+    });
+  </script>
+
+</body>
+</html>

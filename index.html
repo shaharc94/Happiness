@@ -5,15 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>מפת האושר של שחר</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
-      margin: 0;
       font-family: 'Segoe UI', sans-serif;
       background-color: #f4f6f8;
       color: #333;
+      margin: 0;
       padding: 20px;
     }
 
@@ -27,7 +23,7 @@
       border-radius: 8px;
       padding: 20px;
       margin: 20px auto;
-      max-width: 700px;
+      max-width: 750px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
@@ -45,20 +41,36 @@
       resize: vertical;
       min-height: 70px;
       margin-bottom: 10px;
+      margin-top: 10px;
     }
 
-    button {
-      background-color: #2980b9;
-      color: white;
+    .quick-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    .quick-options button {
+      background-color: #ecf0f1;
       border: none;
-      padding: 10px 18px;
-      border-radius: 6px;
+      border-radius: 4px;
+      padding: 5px 10px;
       cursor: pointer;
       transition: 0.3s;
     }
 
-    button:hover {
-      background-color: #1c5f8b;
+    .quick-options button:hover {
+      background-color: #d0dbe3;
+    }
+
+    button.save-btn {
+      background-color: #2980b9;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
     }
 
     .saved-msg {
@@ -89,80 +101,135 @@
 </head>
 <body>
 
-  <h1>מפת האושר של שחר</h1>
+<h1>מפת האושר של שחר</h1>
 
-  <div class="card" id="questions-container"></div>
+<div class="card" id="questions-container"></div>
 
-  <div class="view-entries">
-    <button onclick="showEntries()">הצג רשומות קודמות</button>
-    <div id="entries-container"></div>
-  </div>
+<div class="view-entries">
+  <button onclick="showEntries()">הצג רשומות קודמות</button>
+  <div id="entries-container"></div>
+</div>
 
-  <script>
-    const questions = [
-      "מה חשוב לי לזכור היום?",
-      "מה היה טוב היום?",
-      "עם מי התחברתי השבוע?",
-      "מה יצרתי השבוע?",
-      "האם יצאתי לטיול בטבע?",
-      "מה שיתפתי מהלב השבוע?",
-      "איזו מטרה קטנה השגתי החודש?",
-      "האם יזמתי משהו חברתי עם ערך?",
-      "מה החזרתי לחיים שלי מהעבר?",
-      "מה נהניתי השבוע?",
-      "מה הלחיץ אותי השבוע?",
-      "מה הייתי רוצה לשנות בשבוע הבא?"
-    ];
+<script>
+const questions = [
+  {
+    text: "מה חשוב לי לזכור היום?",
+    options: ["לא חייב להספיק הכל", "אני עושה את הכי טוב שלי", "ליהנות מהדרך"]
+  },
+  {
+    text: "מה היה טוב היום?",
+    options: ["הליכה עם לוסי", "שיחה טובה", "הצלחתי להתקדם בפרויקט"]
+  },
+  {
+    text: "עם מי התחברתי השבוע?",
+    options: ["חבר ישן", "משפחה", "קולגה מהעבודה"]
+  },
+  {
+    text: "מה יצרתי השבוע?",
+    options: ["פוסט אישי", "כלי טכנולוגי", "רגע קטן של השראה"]
+  },
+  {
+    text: "האם יצאתי לטיול בטבע?",
+    options: ["כן, עם לוסי", "טיול קצר לבד", "עוד לא, אבל מתכנן"]
+  },
+  {
+    text: "מה שיתפתי מהלב השבוע?",
+    options: ["משהו אישי בקבוצה", "שיחה כנה עם חבר", "עדיין לא שיתפתי"]
+  },
+  {
+    text: "איזו מטרה קטנה השגתי החודש?",
+    options: ["סיימתי כלי חדש", "שמרתי על שגרה בריאה", "יצרתי משהו חדש"]
+  },
+  {
+    text: "האם יזמתי משהו חברתי עם ערך?",
+    options: ["כן, מפגש חברתי", "הדרכה לקהילה", "עדיין לא"]
+  },
+  {
+    text: "מה החזרתי לחיים שלי מהעבר?",
+    options: ["תחביב ישן", "חבר מהעבר", "הרגל טוב"]
+  },
+  {
+    text: "מה נהניתי השבוע?",
+    options: ["הליכה שקטה", "משהו שצחקתי ממנו", "הרגע שבו נחתי"]
+  },
+  {
+    text: "מה הלחיץ אותי השבוע?",
+    options: ["עומס בעבודה", "אי ודאות", "לחץ פנימי"]
+  },
+  {
+    text: "מה הייתי רוצה לשנות בשבוע הבא?",
+    options: ["להיות יותר רגוע", "ליהנות מהדברים הקטנים", "לא לקחת ללב"]
+  }
+];
 
-    const container = document.getElementById('questions-container');
-    const dateKey = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+const container = document.getElementById('questions-container');
+const dateKey = new Date().toISOString().split('T')[0];
 
-    questions.forEach((question, index) => {
-      const section = document.createElement('div');
+questions.forEach((q, index) => {
+  const section = document.createElement('div');
 
-      const label = document.createElement('label');
-      label.innerText = question;
+  const label = document.createElement('label');
+  label.innerText = q.text;
 
-      const textarea = document.createElement('textarea');
-      textarea.id = `answer-${index}`;
-      textarea.value = JSON.parse(localStorage.getItem(dateKey) || '{}')[`q${index}`] || '';
+  const optionsDiv = document.createElement('div');
+  optionsDiv.className = 'quick-options';
 
-      const saveBtn = document.createElement('button');
-      saveBtn.innerText = 'שמור';
-      const savedMsg = document.createElement('div');
-      savedMsg.className = 'saved-msg';
+  const textarea = document.createElement('textarea');
+  textarea.id = `answer-${index}`;
+  textarea.value = JSON.parse(localStorage.getItem(dateKey) || '{}')[`q${index}`] || '';
 
-      saveBtn.onclick = () => {
-        let entry = JSON.parse(localStorage.getItem(dateKey) || '{}');
-        entry[`q${index}`] = textarea.value;
-        localStorage.setItem(dateKey, JSON.stringify(entry));
-        savedMsg.innerText = 'נשמר בהצלחה!';
-        setTimeout(() => savedMsg.innerText = '', 2000);
-      };
+  q.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.innerText = opt;
+    btn.onclick = () => {
+      textarea.value = opt;
+      saveAnswer(index, textarea);
+    };
+    optionsDiv.appendChild(btn);
+  });
 
-      section.appendChild(label);
-      section.appendChild(textarea);
-      section.appendChild(saveBtn);
-      section.appendChild(savedMsg);
-      container.appendChild(section);
-    });
+  const saveBtn = document.createElement('button');
+  saveBtn.innerText = 'שמור';
+  saveBtn.className = 'save-btn';
+  const savedMsg = document.createElement('div');
+  savedMsg.className = 'saved-msg';
 
-    function showEntries() {
-      const entriesContainer = document.getElementById('entries-container');
-      entriesContainer.innerHTML = '';
-      Object.keys(localStorage).sort().reverse().forEach(key => {
-        if (!key.match(/^\d{4}-\d{2}-\d{2}$/)) return;
-        const data = JSON.parse(localStorage.getItem(key));
-        const div = document.createElement('div');
-        div.className = 'entry';
-        div.innerHTML = `<strong>${key}</strong><br>` +
-          questions.map((q, i) =>
-            data[`q${i}`] ? `<b>${q}</b><br>${data[`q${i}`]}<br><br>` : ''
-          ).join('');
-        entriesContainer.appendChild(div);
-      });
-    }
-  </script>
+  saveBtn.onclick = () => {
+    saveAnswer(index, textarea);
+    savedMsg.innerText = 'נשמר בהצלחה!';
+    setTimeout(() => savedMsg.innerText = '', 2000);
+  };
+
+  section.appendChild(label);
+  section.appendChild(optionsDiv);
+  section.appendChild(textarea);
+  section.appendChild(saveBtn);
+  section.appendChild(savedMsg);
+  container.appendChild(section);
+});
+
+function saveAnswer(index, textarea) {
+  let entry = JSON.parse(localStorage.getItem(dateKey) || '{}');
+  entry[`q${index}`] = textarea.value;
+  localStorage.setItem(dateKey, JSON.stringify(entry));
+}
+
+function showEntries() {
+  const entriesContainer = document.getElementById('entries-container');
+  entriesContainer.innerHTML = '';
+  Object.keys(localStorage).sort().reverse().forEach(key => {
+    if (!key.match(/^\d{4}-\d{2}-\d{2}$/)) return;
+    const data = JSON.parse(localStorage.getItem(key));
+    const div = document.createElement('div');
+    div.className = 'entry';
+    div.innerHTML = `<strong>${key}</strong><br>` +
+      questions.map((q, i) =>
+        data[`q${i}`] ? `<b>${q.text}</b><br>${data[`q${i}`]}<br><br>` : ''
+      ).join('');
+    entriesContainer.appendChild(div);
+  });
+}
+</script>
 
 </body>
 </html>
